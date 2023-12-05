@@ -1,11 +1,14 @@
 // config/database.js
 const mysql = require('mysql');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const connection = mysql.createConnection({
-    host: '34.101.88.100',
-    user: 'root',
-    database: 'ecoscandb',
-    password: 'ecoscan606'
+    host: process.env.HOST,
+    user: process.env.USER,
+    database: process.env.DATABASE,
+    password: process.env.PASSWORD
 });
 
 module.exports = connection;

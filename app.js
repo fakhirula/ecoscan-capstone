@@ -4,6 +4,12 @@ require('@google-cloud/debug-agent').start();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const PORT = process.env.PORT || 8000;
+
 const scanRouter = require('./app/routes/scanRoutes');
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,7 +22,6 @@ app.get("/", (req, res) => {
     res.send("Response Traffic-2 Success!");
 });
 
-const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log("Server is up and listening on " + PORT);
 });

@@ -1,13 +1,16 @@
 // config/storage.js
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const gcs = new Storage({
-    projectId: 'submission-ecoscan',
+    projectId: process.env.PROJECT_ID,
     keyFilename: path.resolve('./serviceaccountkey.json')
 });
 
-const bucketName = 'ecoscan-submission';
+const bucketName = process.env.BUCKET_NAME;
 const bucket = gcs.bucket(bucketName);
 
 module.exports = {
