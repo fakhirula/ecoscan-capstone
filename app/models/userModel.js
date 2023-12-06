@@ -1,3 +1,4 @@
+// app/models/userModel.js
 const connection = require('../../config/database');
 const bcrypt = require('bcrypt');
 
