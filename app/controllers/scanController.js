@@ -39,15 +39,26 @@ const scanController = {
     },
 
     insertScan: (req, res) => {
-        const users_id = req.body.users_id;
-        const date = req.body.date;
+        const users_id = req.user.id;
+        const username = req.user.username;
+        const date = new Date();
         const imageUrl = req.file ? req.file.cloudStoragePublicUrl : '';
 
         Scan.insertScan(users_id, date, imageUrl, (err, result) => {
             if (err) {
-                res.status(500).send({ message: err.sqlMessage });
+                res.status(500).send({ success: false, message: err.sqlMessage });
             } else {
-                res.send({ message: "Insert Successful" });
+                res.send({
+                    success: true,
+                    message: "Insert Successful",
+                    result: {
+                        userId: users_id,
+                        name: username,
+                        date: date,
+                        url: imageUrl,
+                        file: req.file // #########################################################
+                    }
+                });
             }
         });
     },

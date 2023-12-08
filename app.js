@@ -5,20 +5,19 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+
+dotenv.config();
+
 const authRoutes = require('./app/routes/authRoutes');
 const scanRouter = require('./app/routes/scanRoutes');
-const { authenticateToken } = require('./app/middleware/authMiddleware'); // Import middleware otentikasi
-
-
-// Load environment variables from .env file
-dotenv.config();
+const scanNew = require('./app/routes/record'); // #############################################
+const { authenticateToken } = require('./app/middleware/authMiddleware');
 
 const PORT = process.env.PORT || 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/auth', authRoutes);
-// Terapkan middleware otentikasi pada rute-rute yang memerlukan otentikasi
-app.use('/scan', authenticateToken, scanRouter);
+app.use('/scan', authenticateToken, scanNew); // #############################################
 
 app.get("/", (req, res) => {
     console.log("Response success");

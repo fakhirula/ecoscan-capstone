@@ -24,7 +24,7 @@ const Scan = {
     },
 
     insertScan: (users_id, date, imageUrl, callback) => {
-        const query = "INSERT INTO image_scan (users_id, date, attachment) values (?, ?, ?)";
+        const query = "INSERT INTO image_scan (users_id, date, attachment) VALUES (?, ?, ?)";
         connection.query(query, [users_id, date, imageUrl], (err, result, fields) => {
             callback(err, result);
         });

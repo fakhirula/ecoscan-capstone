@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS image_scan (
     id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     users_id INT,
     date DATETIME,
+    filename VARCHAR(255),
     attachment VARCHAR(255),
     FOREIGN KEY (users_id) REFERENCES users(id)
 );

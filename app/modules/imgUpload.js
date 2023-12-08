@@ -1,40 +1,68 @@
-// app/modules/imgUpload.js
-'use strict';
-const { Storage } = require('@google-cloud/storage');
+'use strict'
+const {Storage} = require('@google-cloud/storage')
+const fs = require('fs')
+const dateFormat = require('dateformat')
 const path = require('path');
-const { gcs, bucket, bucketName } = require('../../config/storage');
-const dateFormat = require('dateformat');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const pathKey = path.resolve('./serviceaccountkey.json')
+
+// TODO: Sesuaikan konfigurasi Storage
+const gcs = new Storage({
+    projectId: process.env.HOST,
+    keyFilename: pathKey
+})
+
+// TODO: Tambahkan nama bucket yang digunakan
+const bucketName = process.env.BUCKET_NAME
+const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {
     return 'https://storage.googleapis.com/' + bucketName + '/' + filename;
 }
 
-let ImgUpload = {};
+let ImgUpload = {}
 
 ImgUpload.uploadToGcs = (req, res, next) => {
-    if (!req.file) return next();
+    if (!req.file) return next()
 
-    const gcsname = dateFormat(new Date(), "yyyymmdd-HHMMss");
-    const file = bucket.file(gcsname);
+    const gcsname = dateFormat(new Date(), "yyyymmdd-HHMMss")
+    const file = bucket.file(gcsname)
 
     const stream = file.createWriteStream({
         metadata: {
             contentType: req.file.mimetype
         }
-    });
+    })
 
     stream.on('error', (err) => {
-        req.file.cloudStorageError = err;
-        next(err);
-    });
+        req.file.cloudStorageError = err
+        next(err)
+    })
 
     stream.on('finish', () => {
-        req.file.cloudStorageObject = gcsname;
-        req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-        next();
-    });
+        req.file.cloudStorageObject = gcsname
+        req.file.cloudStoragePublicUrl = getPublicUrl(gcsname)
+        next()
+    })
 
-    stream.end(req.file.buffer);
+    stream.end(req.file.buffer)
+}
+
+ImgUpload.deleteFromGcs = (filename, callback) => {
+    const file = bucket.file(filename);
+
+    file.delete((err, apiResponse) => {
+        if (err) {
+            console.log('Gagal menghapus file:', err);
+            callback(err);
+        } else {
+            console.log('File berhasil dihapus');
+            callback(null, apiResponse);
+        }
+    });
 };
 
-module.exports = ImgUpload;
+module.exports = ImgUpload
