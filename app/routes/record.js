@@ -32,7 +32,6 @@ router.get("/getrecords", (req, res) => {
 })
 
 router.post("/insertrecord", multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
-    console.log('Filename after middleware:', req.file.gcsname)
     const users_id = 1;
     const date = new Date();
     const filename = req.file.cloudStorageObject;;
