@@ -5,41 +5,42 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const register = (req, res) => {
-    const { fullname, username, password, email } = req.body;
+    const { fullname, email, password, city } = req.body;
 
-    User.createUser(fullname, username, password, email, (err, result) => {
+    User.createUser(fullname, email, password, city, (err, result) => {
         if (err) {
-            if (err.message === 'Username is already taken') {
-                return res.status(400).json({ success: false, message: 'Registration failed. Username is already taken. Please choose another username.' });
+            if (err.message === 'Email is already taken') {
+                return res.status(409).json({ success: false, message: 'Registration failed. This email is already registered. Please use a different email.' });
             }
 
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Oops! Something went wrong on our end. Please try again later.' });
         }
 
-        res.status(201).json({ success: true, message: 'User registered successfully.' });
+        res.status(201).json({ success: true, message: 'Registration successful. Welcome aboard!' });
     });
 };
 
 const login = (req, res, next) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    User.getUserByUsernameAndPassword(username, password, (err, user) => {
+    User.getUserByEmailAndPassword(email, password, (err, user) => {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Oops! Something went wrong on our end. Please try again later.' });
         }
 
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Authentication failed. Invalid username or password.' });
+            return res.status(401).json({ success: false, message: 'Login failed. Invalid email or password. Please try again.' });
         }
 
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         return res.json({ 
             success: true, 
             message: "Login successful. Enjoy your day!",
-            loginResult: {
+            userDetail: {
                 userId: user.id,
-                name: user.username,
+                fullname: user.fullname,
+                email: user.email,
                 token: token
             } 
         });
@@ -47,16 +48,16 @@ const login = (req, res, next) => {
 };
 
 const profile = (req, res) => {
-    res.json({ success: true, user: req.user });
+    res.json({ success: true, userProfile: req.user });
 };
 
 const getAllUsers = (req, res) => {
     User.getAllUsers((err, users) => {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Oops! Something went wrong on our end. Please try again later.' });
         }
 
-        res.json({ success: true, users });
+        res.json({ success: true, userList: users });
     });
 };
 

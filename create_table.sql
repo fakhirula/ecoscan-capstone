@@ -1,18 +1,9 @@
-CREATE TABLE records (
-    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    name VARCHAR(25) NOT NULL,
-    amount DOUBLE NOT NULL,
-    date DATETIME NOT NULL,
-    notes TEXT,
-    attachment VARCHAR(255)
-);
-
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     fullname VARCHAR(255) NOT NULL,
-    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    city VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS waste_type (

@@ -1,4 +1,3 @@
-// config/storage.js
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const dotenv = require('dotenv');

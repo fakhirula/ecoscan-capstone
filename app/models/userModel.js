@@ -1,39 +1,38 @@
-// app/models/userModel.js
 const connection = require('../../config/database');
 const bcrypt = require('bcrypt');
 
 const User = {
-    createUser: (fullname, username, password, email, callback) => {
-        const checkQuery = "SELECT * FROM users WHERE username = ?";
-        connection.query(checkQuery, [username], (checkErr, checkResult) => {
+    createUser: (fullname, email, password, city, callback) => {
+        const checkQuery = "SELECT * FROM users WHERE email = ?";
+        connection.query(checkQuery, [email], (checkErr, checkResult) => {
             if (checkErr) {
-                return callback({ status: 500, message: 'Internal Server Error' }, null);
+                return callback(checkErr, null);
             }
             
             if (checkResult.length > 0) {
-                return callback({ status: 400, message: 'Username is already taken' }, null);
+                return callback(new Error('Email is already taken'), null);
             }
             
             // Hash the password and proceed with user registration
             bcrypt.hash(password, 10, (hashErr, hash) => {
                 if (hashErr) {
-                    return callback({ status: 500, message: 'Internal Server Error' }, null);
+                    return callback(hashErr, null);
                 }
-                const insertQuery = "INSERT INTO users (fullname, username, password, email) VALUES (?, ?, ?, ?)";
-                connection.query(insertQuery, [fullname, username, hash, email], (insertErr, result) => {
+                const insertQuery = "INSERT INTO users (fullname, email, password, city) VALUES (?, ?, ?, ?)";
+                connection.query(insertQuery, [fullname, email, hash, city], (insertErr, result) => {
                     if (insertErr) {
-                        return callback({ status: 500, message: 'Internal Server Error' }, null);
+                        return callback(insertErr, null);
                     } else {
-                        callback(null, { status: 201, message: 'User registered successfully.', userId: result.insertId });
+                        callback(null, result);
                     }
                 });
             });
         });
     },
 
-    getUserByUsernameAndPassword: (username, password, callback) => {
-        const query = "SELECT * FROM users WHERE username = ?";
-        connection.query(query, [username], (err, rows) => {
+    getUserByEmailAndPassword: (email, password, callback) => {
+        const query = "SELECT * FROM users WHERE email = ?";
+        connection.query(query, [email], (err, rows) => {
             if (err) {
                 return callback(err, null);
             }

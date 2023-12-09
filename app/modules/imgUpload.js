@@ -9,13 +9,11 @@ dotenv.config();
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// TODO: Sesuaikan konfigurasi Storage
 const gcs = new Storage({
     projectId: process.env.HOST,
     keyFilename: pathKey
 })
 
-// TODO: Tambahkan nama bucket yang digunakan
 const bucketName = process.env.BUCKET_NAME
 const bucket = gcs.bucket(bucketName)
 

@@ -1,4 +1,3 @@
-// app.js
 require('@google-cloud/debug-agent').start();
 
 const express = require('express');
@@ -9,15 +8,16 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const authRoutes = require('./app/routes/authRoutes');
-const scanRouter = require('./app/routes/scanRoutes');
-const scanNew = require('./app/routes/record'); // #############################################
+const scanRoutes = require('./app/routes/scanRoutes');
 const { authenticateToken } = require('./app/middleware/authMiddleware');
 
 const PORT = process.env.PORT || 8000;
 
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use('/auth', authRoutes);
-app.use('/scan', authenticateToken, scanNew); // #############################################
+app.use('/api', authenticateToken, scanRoutes);
 
 app.get("/", (req, res) => {
     console.log("Response success");

@@ -1,97 +1,69 @@
-// app/controllers/scanController.js
-const Scan = require('../models/scanModel');
-const ImgUpload = require('../modules/imgUpload');
+const imageModel = require('../models/scanModel');
+const imgUpload = require('../modules/imgUpload');
+const Multer = require('multer');
 
-const scanController = {
-    getDashboard: (req, res) => {
-        // Implement logic for the dashboard route
-    },
+const multer = Multer({
+    storage: Multer.MemoryStorage,
+    fileSize: 5 * 1024 * 1024
+});
 
-    getScans: (req, res) => {
-        Scan.getScans((err, scans) => {
-            if (err) {
-                res.status(500).send({ message: err.sqlMessage });
-            } else {
-                res.json(scans);
-            }
-        });
-    },
+exports.getScans = (req, res) => {
+    imageModel.getScans((err, rows) => {
+        if(err) {
+            res.status(500).send({message: err.sqlMessage})
+        } else {
+            res.json(rows)
+        }
+    });
+};
 
-    getLast10Scans: (req, res) => {
-        Scan.getLast10Scans((err, scans) => {
-            if (err) {
-                res.status(500).send({ message: err.sqlMessage });
-            } else {
-                res.json(scans);
-            }
-        });
-    },
+exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
+    const users_id = req.user.id;
+    const fullname = req.user.fullname;
+    const date = new Date();
+    const filename = req.file.cloudStorageObject;;
+    var imageUrl = '';
 
-    getScanById: (req, res) => {
-        const id = req.params.id;
-        Scan.getScanById(id, (err, scan) => {
-            if (err) {
-                res.status(500).send({ message: err.sqlMessage });
-            } else {
-                res.json(scan);
-            }
-        });
-    },
+    if (req.file && req.file.cloudStoragePublicUrl) {
+        imageUrl = req.file.cloudStoragePublicUrl
+    }
 
-    insertScan: (req, res) => {
-        const users_id = req.user.id;
-        const username = req.user.username;
-        const date = new Date();
-        const imageUrl = req.file ? req.file.cloudStoragePublicUrl : '';
-
-        Scan.insertScan(users_id, date, imageUrl, (err, result) => {
-            if (err) {
-                res.status(500).send({ success: false, message: err.sqlMessage });
-            } else {
-                res.send({
+    imageModel.insertScan(users_id, date, filename, imageUrl, (err, result) => {
+        if (err) {
+            res.status(500).send({message: err.sqlMessage})
+        } else {
+            res.send({
                     success: true,
                     message: "Insert Successful",
                     result: {
                         userId: users_id,
-                        name: username,
+                        fullname: fullname,
                         date: date,
-                        url: imageUrl,
-                        file: req.file // #########################################################
+                        filename: filename,
+                        url: imageUrl
                     }
                 });
-            }
-        });
-    },
+        }
+    });
+}];
 
-    editScan: (req, res) => {
-        const id = req.params.id;
-        const users_id = req.body.users_id;
-        const date = req.body.date;
-        const imageUrl = req.file ? req.file.cloudStoragePublicUrl : '';
-
-        Scan.editScan(id, users_id, date, imageUrl, (err, result) => {
-            if (err) {
-                res.status(500).send({ message: err.sqlMessage });
-            } else {
-                res.send({ message: "Update Successful" });
-            }
-        });
-    },
-
-    deleteScan: (req, res) => {
-        const id = req.params.id;
-        Scan.deleteScan(id, (err, result) => {
-            if (err) {
-                res.status(500).send({ message: err.sqlMessage });
-            } else {
-                res.send({ message: "Delete successful" });
-            }
-        });
-    },
-
-    uploadImage: (req, res, next) => {
-        ImgUpload.uploadToGcs(req, res, next);
+exports.uploadImage = [multer.single('image'), imgUpload.uploadToGcs, (req, res, next) => {
+    const data = req.body
+    if (req.file && req.file.cloudStoragePublicUrl) {
+        data.imageUrl = req.file.cloudStoragePublicUrl
     }
-};
 
-module.exports = scanController;
+    res.send(data)
+}];
+
+exports.deleteScan = (req, res) => {
+    const id = req.params.id;
+
+    imageModel.deleteScan(id, (err, result) => {
+        if (err) {
+            res.status(500).send({message: err.sqlMessage});
+        } else {
+            res.send({message: "Delete Successful"});
+        }
+    });
+};
