@@ -8,11 +8,35 @@ const multer = Multer({
 });
 
 exports.getScans = (req, res) => {
-    imageModel.getScans((err, rows) => {
+    imageModel.getScans((err, scans) => {
         if(err) {
-            res.status(500).send({message: err.sqlMessage})
+            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
-            res.json(rows)
+            res.json(scans)
+        }
+    });
+};
+
+exports.getScanById = (req, res) => {
+    const id = req.params.id;
+    imageModel.getScanById(id, (err, scan) => {
+        if(err) {
+            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
+        } else if (scan.length > 0) {
+            res.json(scan[0])
+        } else {
+            res.status(404).send({message: 'Scan not found.'})
+        }
+    });
+};
+
+exports.getScansByUser = (req, res) => {
+    const users_id = req.user.id;
+    imageModel.getScansByUser(users_id, (err, scans) => {
+        if(err) {
+            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
+        } else {
+            res.json(scans)
         }
     });
 };
@@ -30,19 +54,19 @@ exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, 
 
     imageModel.insertScan(users_id, date, filename, imageUrl, (err, result) => {
         if (err) {
-            res.status(500).send({message: err.sqlMessage})
+            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
             res.send({
-                    success: true,
-                    message: "Insert Successful",
-                    result: {
-                        userId: users_id,
-                        fullname: fullname,
-                        date: date,
-                        filename: filename,
-                        url: imageUrl
-                    }
-                });
+                success: true,
+                message: "Image uploaded successfully",
+                result: {
+                    userId: users_id,
+                    fullname: fullname,
+                    date: date,
+                    filename: filename,
+                    url: imageUrl
+                }
+            });
         }
     });
 }];
@@ -61,9 +85,9 @@ exports.deleteScan = (req, res) => {
 
     imageModel.deleteScan(id, (err, result) => {
         if (err) {
-            res.status(500).send({message: err.sqlMessage});
+            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'});
         } else {
-            res.send({message: "Delete Successful"});
+            res.send({message: "Image deleted successfully"});
         }
     });
 };

@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const imageController = require('../controllers/scanController');
+const scanController = require('../controllers/scanController');
 
-router.get("/getscans", imageController.getScans);
-router.post("/insertscan", imageController.insertScan);
-router.post("/uploadImage", imageController.uploadImage);
-router.delete("/deletescan/:id", imageController.deleteScan);
+router.get("/getscans", scanController.getScans);
+router.get("/getscan/:id", scanController.getScanById);
+router.get("/scans/user", scanController.getScansByUser);
+router.post("/insertscan", scanController.insertScan);
+router.post("/uploadImage", scanController.uploadImage);
+router.delete("/deletescan/:id", scanController.deleteScan);
 
 module.exports = router;

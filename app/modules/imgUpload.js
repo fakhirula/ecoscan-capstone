@@ -54,10 +54,8 @@ ImgUpload.deleteFromGcs = (filename, callback) => {
 
     file.delete((err, apiResponse) => {
         if (err) {
-            console.log('Gagal menghapus file:', err);
             callback(err);
         } else {
-            console.log('File berhasil dihapus');
             callback(null, apiResponse);
         }
     });
