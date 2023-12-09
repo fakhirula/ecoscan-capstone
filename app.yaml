@@ -1,7 +1,3 @@
-runtime: nodejs16
+runtime: nodejs20
 # service: backend
 service: default
-
-
-# Instance: ecoscan-ins
-# Password: ecoscan606
