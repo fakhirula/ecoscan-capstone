@@ -4,11 +4,8 @@ const scanController = require('../controllers/scanController');
 
 router.get("/getscans", scanController.getScans);
 router.get("/getscan/:id", scanController.getScanById);
-router.get("/scans/user", scanController.getScansByUser);
-router.post("/insertscan", scanController.insertScan);
-router.post("/uploadImage", scanController.uploadImage);
+router.get("/getscans/user", scanController.getScansByUser);
+router.post('/insertAndPredict', scanController.insertAndPredict);
 router.delete("/deletescan/:id", scanController.deleteScan);
-
-router.post('/predict', scanController.predictImage);
 
 module.exports = router;

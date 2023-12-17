@@ -11,7 +11,7 @@ const multer = Multer({
 });
 
 const model = new TeachableMachine({
-  modelUrl: "https://teachablemachine.withgoogle.com/models/r_FJjjBKN/" // Recycle and Organic
+  modelUrl: "https://teachablemachine.withgoogle.com/models/tEesVahx2/" // Recycle and Organic
 });
 
 exports.getScans = (req, res) => {
@@ -73,76 +73,72 @@ exports.getScansByUser = (req, res) => {
     });
 };
 
-exports.predictImage = async (req, res, next) => {
-    try {
-        const { url } = req.query;
+exports.insertAndPredict = [multer.single('attachment'), imgUpload.uploadToGcs, async (req, res) => {
+        const users_id = req.user.id;
+        const fullname = req.user.fullname;
+        const date = new Date();
+        var waste_type = null;
+        const filename = req.file ? req.file.cloudStorageObject : '';
+        var imageUrl = '';
 
-        if (!url || typeof url !== 'string') {
-            return res.status(400).json({ message: 'Invalid or missing URL parameter. Please provide a valid image URL.' });
+        if (!req.file) {
+            res.status(400).send({message: 'No image file was provided. Please upload an image.'});
+            return;
         }
 
-        const predictions = await model.classify({
-            imageUrl: url,
-        });
-
-        console.log("Predictions:", predictions);
-        res.json(predictions);
-
-    } catch (e) {
-        console.error("ERROR", e);
-        if (e instanceof TypeError) {
-            res.status(400).json({ message: 'An error occurred. Please ensure the URL is correct and points to a valid image.' });
-        } else {
-            res.status(500).json({ message: 'An unexpected error occurred on our end. Please try again later.' });
+        if (req.file && req.file.cloudStoragePublicUrl) {
+            imageUrl = req.file.cloudStoragePublicUrl;
         }
-    }
-};
 
-exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
-    const users_id = req.user.id;
-    const fullname = req.user.fullname;
-    const date = new Date();
-    var waste_type = null;
-    const filename = req.file ? req.file.cloudStorageObject : '';
-    var imageUrl = '';
+        // Insert the scan
+        imageModel.insertScan(users_id, date, waste_type, filename, imageUrl, async (err, result) => {
+            if (err) {
+                res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'});
+            } else {
+                const insertedScanId = result.insertId;
 
-    if (!req.file) {
-        res.status(400).send({message: 'No image file was provided. Please upload an image.'});
-        return;
-    }
+                // Predict the image class
+                try {
+                    const predictions = await model.classify({
+                        imageUrl: imageUrl,
+                    });
 
-    if (req.file && req.file.cloudStoragePublicUrl) {
-        imageUrl = req.file.cloudStoragePublicUrl
-    }
+                    if (predictions && predictions.length > 0) {
+                        const predictedClass = predictions[0].class;
 
-    imageModel.insertScan(users_id, date, waste_type, filename, imageUrl, (err, result) => {
-        if (err) {
-            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
-        } else {
-            res.send({
-                success: true,
-                message: "Image uploaded successfully",
-                result: {
-                    userId: users_id,
-                    fullname: fullname,
-                    date: date,
-                    waste_type: waste_type,
-                    filename: filename,
-                    url: imageUrl
+                        // Update the waste_type in the inserted scan
+                        imageModel.updateWasteType(insertedScanId, predictedClass, (updateErr, updateResult) => {
+                            if (updateErr) {
+                                console.error("Error updating waste type:", updateErr);
+                            }
+                        });
+
+                        res.send({
+                            success: true,
+                            message: 'Image uploaded and classified successfully.',
+                            result: {
+                                userId: users_id,
+                                fullname: fullname,
+                                date: date,
+                                waste_type: predictedClass,
+                                filename: filename,
+                                url: imageUrl
+                            }
+                        });
+                    } else {
+                        res.json({
+                            success: false,
+                            message: 'No predictions could be made. Please ensure the image is clear and try again.'
+                        });
+                    }
+                } catch (predictionError) {
+                    console.error("Prediction error:", predictionError);
+                    res.status(500).json({message: 'An unexpected error occurred during prediction. Please try again later.'});
                 }
-            });
-        }
-    });
-}];
-
-exports.uploadImage = [multer.single('image'), imgUpload.uploadToGcs, (req, res, next) => {
-    const data = req.body
-    if (req.file && req.file.cloudStoragePublicUrl) {
-        data.imageUrl = req.file.cloudStoragePublicUrl
+            }
+        });
     }
-
-    res.send(data)
-}];
+];
 
 exports.deleteScan = (req, res) => {
     const id = req.params.id;

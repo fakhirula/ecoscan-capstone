@@ -12,13 +12,18 @@ exports.getScanById = (id, callback) => {
 };
 
 exports.getScansByUser = (users_id, callback) => {
-    const query = "SELECT * FROM image_scan WHERE users_id = ? ORDER BY date DESC LIMIT 10"
+    const query = "SELECT * FROM image_scan WHERE users_id = ? ORDER BY date DESC"
     connection.query(query, [users_id], callback);
 };
 
 exports.insertScan = (users_id, date, waste_type, filename, imageUrl, callback) => {
     const query = "INSERT INTO image_scan (users_id, date, waste_type, filename, attachment) VALUES (?, ?, ?, ?, ?)"
     connection.query(query, [users_id, date, waste_type, filename, imageUrl], callback);
+};
+
+exports.updateWasteType = (scanId, wasteType, callback) => {
+    const query = "UPDATE image_scan SET waste_type = ? WHERE id = ?";
+    connection.query(query, [wasteType, scanId], callback);
 };
 
 exports.deleteScan = (id, callback) => {
