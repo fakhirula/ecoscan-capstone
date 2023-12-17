@@ -2,8 +2,12 @@
 
 
 <!-- PROJECT LOGO -->
-<br /><hr><br />
-  <h1 align="center">EcoScan : Organic and Inorganic Waste Detection</h1>
+<div align="center">
+
+#### Server Side Branch
+## EcoScan : Organic and Inorganic Waste Detection
+
+</div>
 <br><hr><br>
 
 
