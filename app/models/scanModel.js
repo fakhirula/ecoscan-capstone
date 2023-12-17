@@ -31,18 +31,35 @@ exports.deleteScan = (id, callback) => {
 
             // Check if filename exists
             if (filename) {
-                // Delete the file from the bucket
-                imgUpload.deleteFromGcs(filename, (err, apiResponse) => {
+                // Check if file exists in the bucket
+                imgUpload.fileExistsInGcs(filename, (err, exists) => {
                     if (err) {
                         callback(err);
+                    } else if (exists) {
+                        // Delete the file from the bucket
+                        imgUpload.deleteFromGcs(filename, (err, apiResponse) => {
+                            if (err) {
+                                callback(err);
+                            } else {
+                                // Delete the data from the database
+                                const deleteQuery = "DELETE FROM image_scan WHERE id = ?";
+                                connection.query(deleteQuery, [id], (err, result) => {
+                                    if (err) {
+                                        callback(err);
+                                    } else {
+                                        callback(null, result, apiResponse);
+                                    }
+                                });
+                            }
+                        });
                     } else {
-                        // Delete the data from the database
+                        // Delete the data from the database if the file does not exist in the bucket
                         const deleteQuery = "DELETE FROM image_scan WHERE id = ?";
                         connection.query(deleteQuery, [id], (err, result) => {
                             if (err) {
                                 callback(err);
                             } else {
-                                callback(null, result, apiResponse);
+                                callback(null, result);
                             }
                         });
                     }

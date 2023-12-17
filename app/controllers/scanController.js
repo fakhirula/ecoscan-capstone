@@ -12,11 +12,18 @@ exports.getScans = (req, res) => {
         if(err) {
             res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
-            res.json({
-                success: true,
-                message: "Scans fetched successfully",
-                listScans: scans
-            })
+            if(scans.length === 0) {
+                res.status(200).send({
+                    success: false,
+                    message: 'No scans found'
+                });
+            } else {
+                res.status(200).json({
+                    success: true,
+                    message: "Scans fetched successfully",
+                    listScans: scans
+                });
+            }
         }
     });
 };
@@ -27,12 +34,12 @@ exports.getScanById = (req, res) => {
         if(err) {
             res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else if (scan.length > 0) {
-            res.json(scan[0])
+            res.status(200).json(scan[0]);
         } else {
             res.status(404).send({
                 success: false,
                 message: 'Scan not found.'
-            })
+            });
         }
     });
 };
@@ -40,14 +47,21 @@ exports.getScanById = (req, res) => {
 exports.getScansByUser = (req, res) => {
     const users_id = req.user.id;
     imageModel.getScansByUser(users_id, (err, listScans) => {
-        if(err) {
-            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
+        if (err) {
+            res.status(500).send({ message: 'Oops! Something went wrong on our end. Please try again later.' });
         } else {
-            res.json({
-                success: true,
-                message: "Scans fetched successfully",
-                listScans: listScans
-            })
+            if (listScans.length === 0) {
+                res.json({
+                    success: false,
+                    message: "No scans found"
+                });
+            } else {
+                res.json({
+                    success: true,
+                    message: "Scans fetched successfully",
+                    listScans: listScans
+                });
+            }
         }
     });
 };

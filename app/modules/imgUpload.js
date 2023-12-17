@@ -49,6 +49,17 @@ ImgUpload.uploadToGcs = (req, res, next) => {
     stream.end(req.file.buffer)
 }
 
+ImgUpload.fileExistsInGcs = (filename, callback) => {
+    const file = bucket.file(filename);
+
+    file.exists().then(data => {
+        const exists = data[0];
+        callback(null, exists);
+    }).catch(err => {
+        callback(err);
+    });
+};
+
 ImgUpload.deleteFromGcs = (filename, callback) => {
     const file = bucket.file(filename);
 

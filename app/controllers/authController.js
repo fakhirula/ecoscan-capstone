@@ -57,7 +57,16 @@ const getAllUsers = (req, res) => {
             return res.status(500).json({ success: false, message: 'Oops! Something went wrong on our end. Please try again later.' });
         }
 
-        res.json({ success: true, userList: users });
+        if (users.length === 0) {
+            res.json({ success: false, message: 'No users found.' });
+        } else {
+            const usersWithoutPassword = users.map(user => {
+                const { password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
+            });
+
+            res.json({ success: true, userList: usersWithoutPassword });
+        }
     });
 };
 
