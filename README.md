@@ -14,7 +14,7 @@
 This repository has multiple branches. You can select the branch that suits your needs:
 - main
 - server
-- md
+- mobile-dev
 
 <br>
 
