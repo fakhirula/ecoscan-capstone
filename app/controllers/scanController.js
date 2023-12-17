@@ -1,10 +1,17 @@
 const imageModel = require('../models/scanModel');
 const imgUpload = require('../modules/imgUpload');
 const Multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+const TeachableMachine = require("@sashido/teachablemachine-node");
 
 const multer = Multer({
     storage: Multer.MemoryStorage,
     fileSize: 5 * 1024 * 1024
+});
+
+const model = new TeachableMachine({
+  modelUrl: "https://teachablemachine.withgoogle.com/models/r_FJjjBKN/" // Recycle and Organic
 });
 
 exports.getScans = (req, res) => {
@@ -66,11 +73,36 @@ exports.getScansByUser = (req, res) => {
     });
 };
 
+exports.predictImage = async (req, res, next) => {
+    try {
+        const { url } = req.query;
+
+        if (!url || typeof url !== 'string') {
+            return res.status(400).json({ message: 'Invalid or missing URL parameter. Please provide a valid image URL.' });
+        }
+
+        const predictions = await model.classify({
+            imageUrl: url,
+        });
+
+        console.log("Predictions:", predictions);
+        res.json(predictions);
+
+    } catch (e) {
+        console.error("ERROR", e);
+        if (e instanceof TypeError) {
+            res.status(400).json({ message: 'An error occurred. Please ensure the URL is correct and points to a valid image.' });
+        } else {
+            res.status(500).json({ message: 'An unexpected error occurred on our end. Please try again later.' });
+        }
+    }
+};
+
 exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, res) => {
     const users_id = req.user.id;
     const fullname = req.user.fullname;
     const date = new Date();
-    var waste_type = 'Testing';
+    var waste_type = null;
     const filename = req.file ? req.file.cloudStorageObject : '';
     var imageUrl = '';
 

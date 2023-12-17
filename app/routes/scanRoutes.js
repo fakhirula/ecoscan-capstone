@@ -9,4 +9,6 @@ router.post("/insertscan", scanController.insertScan);
 router.post("/uploadImage", scanController.uploadImage);
 router.delete("/deletescan/:id", scanController.deleteScan);
 
+router.post('/predict', scanController.predictImage);
+
 module.exports = router;
