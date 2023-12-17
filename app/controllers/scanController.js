@@ -12,7 +12,11 @@ exports.getScans = (req, res) => {
         if(err) {
             res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
-            res.json(scans)
+            res.json({
+                success: true,
+                message: "Scans fetched successfully",
+                listScans: scans
+            })
         }
     });
 };
@@ -25,18 +29,25 @@ exports.getScanById = (req, res) => {
         } else if (scan.length > 0) {
             res.json(scan[0])
         } else {
-            res.status(404).send({message: 'Scan not found.'})
+            res.status(404).send({
+                success: false,
+                message: 'Scan not found.'
+            })
         }
     });
 };
 
 exports.getScansByUser = (req, res) => {
     const users_id = req.user.id;
-    imageModel.getScansByUser(users_id, (err, scans) => {
+    imageModel.getScansByUser(users_id, (err, listScans) => {
         if(err) {
             res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
-            res.json(scans)
+            res.json({
+                success: true,
+                message: "Scans fetched successfully",
+                listScans: listScans
+            })
         }
     });
 };
@@ -45,14 +56,20 @@ exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, 
     const users_id = req.user.id;
     const fullname = req.user.fullname;
     const date = new Date();
-    const filename = req.file.cloudStorageObject;;
+    var waste_type = 'Testing';
+    const filename = req.file ? req.file.cloudStorageObject : '';
     var imageUrl = '';
+
+    if (!req.file) {
+        res.status(400).send({message: 'No image file was provided. Please upload an image.'});
+        return;
+    }
 
     if (req.file && req.file.cloudStoragePublicUrl) {
         imageUrl = req.file.cloudStoragePublicUrl
     }
 
-    imageModel.insertScan(users_id, date, filename, imageUrl, (err, result) => {
+    imageModel.insertScan(users_id, date, waste_type, filename, imageUrl, (err, result) => {
         if (err) {
             res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'})
         } else {
@@ -63,6 +80,7 @@ exports.insertScan = [multer.single('attachment'), imgUpload.uploadToGcs, (req, 
                     userId: users_id,
                     fullname: fullname,
                     date: date,
+                    waste_type: waste_type,
                     filename: filename,
                     url: imageUrl
                 }
@@ -85,7 +103,11 @@ exports.deleteScan = (req, res) => {
 
     imageModel.deleteScan(id, (err, result) => {
         if (err) {
-            res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'});
+            if (err.message === "Scan not found") {
+                res.status(404).send({message: 'Scan not found.'});
+            } else {
+                res.status(500).send({message: 'Oops! Something went wrong on our end. Please try again later.'});
+            }
         } else {
             res.send({message: "Image deleted successfully"});
         }

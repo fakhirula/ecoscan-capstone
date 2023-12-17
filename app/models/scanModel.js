@@ -16,13 +16,12 @@ exports.getScansByUser = (users_id, callback) => {
     connection.query(query, [users_id], callback);
 };
 
-exports.insertScan = (users_id, date, filename, imageUrl, callback) => {
-    const query = "INSERT INTO image_scan (users_id, date, filename, attachment) VALUES (?, ?, ?, ?)"
-    connection.query(query, [users_id, date, filename, imageUrl], callback);
+exports.insertScan = (users_id, date, waste_type, filename, imageUrl, callback) => {
+    const query = "INSERT INTO image_scan (users_id, date, waste_type, filename, attachment) VALUES (?, ?, ?, ?, ?)"
+    connection.query(query, [users_id, date, waste_type, filename, imageUrl], callback);
 };
 
 exports.deleteScan = (id, callback) => {
-    // Step 1: Get the filename from the database
     const query = "SELECT filename FROM image_scan WHERE id = ?";
     connection.query(query, [id], (err, result) => {
         if (err) {
@@ -32,12 +31,12 @@ exports.deleteScan = (id, callback) => {
 
             // Check if filename exists
             if (filename) {
-                // Step 2: Delete the file from the bucket
+                // Delete the file from the bucket
                 imgUpload.deleteFromGcs(filename, (err, apiResponse) => {
                     if (err) {
                         callback(err);
                     } else {
-                        // Step 3: Delete the data from the database
+                        // Delete the data from the database
                         const deleteQuery = "DELETE FROM image_scan WHERE id = ?";
                         connection.query(deleteQuery, [id], (err, result) => {
                             if (err) {
@@ -49,7 +48,7 @@ exports.deleteScan = (id, callback) => {
                     }
                 });
             } else {
-                // Step 3: Delete the data from the database if there is no filename
+                // Delete the data from the database if there is no filename
                 const deleteQuery = "DELETE FROM image_scan WHERE id = ?";
                 connection.query(deleteQuery, [id], (err, result) => {
                     if (err) {

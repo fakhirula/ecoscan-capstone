@@ -32,7 +32,7 @@ const login = (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Login failed. Invalid email or password. Please try again.' });
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         return res.json({ 
             success: true, 
