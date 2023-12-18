@@ -82,10 +82,16 @@ exports.insertAndPredict = [multer.single('attachment'), async (req, res, next) 
 
     // Compress the image
     try {
-        const compressedImageBuffer = await sharp(req.file.buffer)
-            .resize(800)
-            .jpeg({ quality: 80 })
-            .toBuffer();
+        const image = sharp(req.file.buffer).resize(800);
+        let compressedImageBuffer;
+
+        if (req.file.mimetype === 'image/png') {
+            compressedImageBuffer = await image.png({ quality: 80 }).toBuffer();
+        } else if (req.file.mimetype === 'image/jpeg') {
+            compressedImageBuffer = await image.jpeg({ quality: 80 }).toBuffer();
+        } else {
+            throw new Error('Unsupported image format. Please upload a JPEG or PNG image.');
+        }
 
         req.file.buffer = compressedImageBuffer;
 
