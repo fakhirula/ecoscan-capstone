@@ -16,10 +16,11 @@ import com.example.ecoscan.ui.ViewModelFactory
 import com.example.ecoscan.ui.home.HomeActivity
 
 class ProfileActivity : AppCompatActivity() {
-    private lateinit var binding:ActivityProfileBinding
+    private lateinit var binding: ActivityProfileBinding
     private val viewModel by viewModels<ProfileViewModel> {
         ViewModelFactory.getInstance(this)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
@@ -34,34 +35,46 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setupAction() {
-        viewModel.getSession().observe(this){
+        viewModel.getSession().observe(this) {
             binding.name.setText(it.fullname)
             binding.email.setText(it.email)
             viewModel.set10Scan(it.token)
         }
-        binding.btnBack.setOnClickListener{onBackPressed()}
-        binding.logout.setOnClickListener{
-            viewModel.logout()
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            finish()
+        binding.btnBack.setOnClickListener { onBackPressed() }
+        binding.logout.setOnClickListener {
+//            AlertDialog.Builder(this).apply {
+//                setTitle(R.string.alertFailure)
+//                setMessage(getString(R.string.logout_alert))
+//                setPositiveButton(R.string.ButtonAlert) { dialog, _ ->
+//                    viewModel.logout()
+//                    val intent = Intent(context, MainActivity::class.java)
+//                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+//                    startActivity(intent)
+//                    finish()
+//                }
+//                setNegativeButton("Cancel") { dialog, _ ->
+//                    dialog.dismiss()
+//                }
+//            }.show()
         }
-        viewModel.isLoading.observe(this) {
+        viewModel.isLoading.observe(this)
+        {
             showLoading(it)
         }
 
-        viewModel.listScan.observe(this){
+        viewModel.listScan.observe(this)
+        {
             setScan(it)
         }
-        viewModel.alert.observe(this) {
+        viewModel.alert.observe(this)
+        {
             showAlert(it.success, it.message)
         }
     }
 
     private fun setScan(listScan: List<ListScansItem>?) {
-        if (listScan != null){
-            val adapter=ScanAdapter()
+        if (listScan != null) {
+            val adapter = ScanAdapter()
             adapter.submitList(listScan)
             binding.rvScanUser.adapter = adapter
         }
@@ -72,15 +85,16 @@ class ProfileActivity : AppCompatActivity() {
             AlertDialog.Builder(this).apply {
                 setTitle(R.string.alertFailure)
                 setMessage(message)
-                if (message=="Oh no! Your token seems to be invalid. Please check and try again."){
+                if (message == getString(R.string.invalid_token)) {
                     setPositiveButton(R.string.login) { dialog, _ ->
                         viewModel.logout()
                         val intent = Intent(context, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(intent)
                         finish()
                     }
-                }else{
+                } else {
                     setPositiveButton(R.string.ButtonAlert) { dialog, _ ->
                         dialog.dismiss()
                     }
@@ -88,6 +102,7 @@ class ProfileActivity : AppCompatActivity() {
             }.show()
         }
     }
+
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }

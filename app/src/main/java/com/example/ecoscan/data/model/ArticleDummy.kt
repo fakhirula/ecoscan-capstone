@@ -24,21 +24,21 @@ object ArticleDummy {
         ),
         article(
             4,
-            "Developing Indonesia’s circular economy from Bantar Gebang trash mountain",
-            "https://img.jakpost.net/c/2023/02/21/2023_02_21_135734_1676949801._large.jpg",
-            "https://www.thejakartapost.com/opinion/2023/02/22/developing-indonesias-circular-economy-from-bantar-gebang-trash-mountain.html"
+            "Reduce Food Waste During Eid Fitr with These Helpful Tips",
+            "https://greeneration.org/en/wp-content/uploads/2022/07/Kurangi-sampah-lebaran1-768x511-1-624x415-1.jpg",
+            "https://greeneration.org/en/publication/green-info/reduce-food-waste-during-eid-fitr-with-these-helpful-tips/"
         ),
         article(
             5,
-            "Developing Indonesia’s circular economy from Bantar Gebang trash mountain",
-            "https://img.jakpost.net/c/2023/02/21/2023_02_21_135734_1676949801._large.jpg",
-            "https://www.thejakartapost.com/opinion/2023/02/22/developing-indonesias-circular-economy-from-bantar-gebang-trash-mountain.html"
+            "Food Waste vs Food Loss, What’s The Difference?",
+            "https://greeneration.org/en/wp-content/uploads/2022/07/Gambar-1-01-FOOD-LOSS-vs-FOOD-WASTE-1.jpg",
+            "https://greeneration.org/en/publication/green-info/food-waste-vs-food-loss-whats-the-difference/"
         ),
         article(
             6,
-            "Developing Indonesia’s circular economy from Bantar Gebang trash mountain",
-            "https://img.jakpost.net/c/2023/02/21/2023_02_21_135734_1676949801._large.jpg",
-            "https://www.thejakartapost.com/opinion/2023/02/22/developing-indonesias-circular-economy-from-bantar-gebang-trash-mountain.html"
+            "Blue Carbon An Effective Way Tackling Climate Change",
+            "https://greeneration.org/en/wp-content/uploads/2023/12/abotne5i9utc907fpzfk-1024x682.jpg",
+            "https://greeneration.org/en/publication/green-info/blue-carbon-tackling-climate-change/"
         )
     )
 }

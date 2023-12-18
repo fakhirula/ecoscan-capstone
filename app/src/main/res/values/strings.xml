@@ -41,4 +41,6 @@
     <string name="processing">Processing...</string>
     <string name="type_waste">Type Waste : %1$s</string>
     <string name="date">Date : %1$s</string>
+    <string name="invalid_token">Oh no! Your token seems to be invalid. Please check and try again.</string>
+    <string name="logout_alert">Are you sure you want to log out?</string>
 </resources>
