@@ -42,20 +42,20 @@ class ProfileActivity : AppCompatActivity() {
         }
         binding.btnBack.setOnClickListener { onBackPressed() }
         binding.logout.setOnClickListener {
-//            AlertDialog.Builder(this).apply {
-//                setTitle(R.string.alertFailure)
-//                setMessage(getString(R.string.logout_alert))
-//                setPositiveButton(R.string.ButtonAlert) { dialog, _ ->
-//                    viewModel.logout()
-//                    val intent = Intent(context, MainActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-//                    startActivity(intent)
-//                    finish()
-//                }
-//                setNegativeButton("Cancel") { dialog, _ ->
-//                    dialog.dismiss()
-//                }
-//            }.show()
+            AlertDialog.Builder(this).apply {
+                setTitle(getString(R.string.attention))
+                setMessage(getString(R.string.logout_alert))
+                setPositiveButton(R.string.ButtonAlert) { dialog, _ ->
+                    viewModel.logout()
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                    finish()
+                }
+                setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+            }.show()
         }
         viewModel.isLoading.observe(this)
         {

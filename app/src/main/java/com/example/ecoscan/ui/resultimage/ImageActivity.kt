@@ -54,6 +54,7 @@ class ImageActivity : AppCompatActivity() {
             scaleType = ImageView.ScaleType.CENTER_CROP
         }
         binding.btnUpload.setOnClickListener {
+            binding.btnUpload.visibility =View.GONE
             uploadImage()
         }
     }

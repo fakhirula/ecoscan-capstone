@@ -43,4 +43,6 @@
     <string name="date">Date : %1$s</string>
     <string name="invalid_token">Oh no! Your token seems to be invalid. Please check and try again.</string>
     <string name="logout_alert">Are you sure you want to log out?</string>
+    <string name="attention">Attention</string>
+    <string name="cancel">Cancel</string>
 </resources>
