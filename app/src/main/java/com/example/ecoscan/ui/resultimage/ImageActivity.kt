@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.net.toUri
 import com.example.ecoscan.R
 import com.example.ecoscan.databinding.ActivityImageBinding
@@ -113,14 +114,6 @@ class ImageActivity : AppCompatActivity() {
         sheetDialog.apply {
             setContentView(binding.root)
             show()
-            setOnDismissListener{
-                sheetDialog.dismiss()
-                val intent = Intent(context, HomeActivity::class.java )
-                intent.flags =
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                finish()
-            }
             binding.btnProfie.setOnClickListener {
                 val intent = Intent(context, ProfileActivity::class.java )
                 startActivity(intent)
