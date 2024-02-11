@@ -12,7 +12,7 @@ const multer = Multer({
 });
 
 const model = new TeachableMachine({
-  modelUrl: "https://teachablemachine.withgoogle.com/models/tEesVahx2/" // Recycle and Organic
+    modelUrl: "https://teachablemachine.withgoogle.com/models/tEesVahx2/" // Recycle and Organic
 });
 
 exports.getScans = (req, res) => {
